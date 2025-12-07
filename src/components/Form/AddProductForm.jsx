@@ -4,14 +4,49 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { imageUpload } from "../../utils";
 import useAuth from "../../hooks/useAuth";
+import LoadingSpinner from "../Shared/LoadingSpinner";
+import ErrorPage from "../../pages/ErrorPage";
+import { useMutation } from "@tanstack/react-query";
 
 
 const AddProductForm = () => {
     const {user}=useAuth()
+
+const {
+    isPending,
+    isError,
+    mutateAsync,
+    reset: mutationReset,
+  } = useMutation({
+    mutationFn: async payload =>
+      await axios.post(`${import.meta.env.VITE_API_URL}/products`, payload),
+    onSuccess: data => {
+      console.log(data)
+      // show toast
+      toast.success('Product Added successfully')
+      // navigate to my inventory page
+      mutationReset()
+      // Query key invalidate
+    },
+    onError: error => {
+      console.log(error)
+    },
+    onMutate: payload => {
+      console.log('I will post this data--->', payload)
+    },
+    onSettled: (data, error) => {
+      console.log('I am from onSettled--->', data)
+      if (error) console.log(error)
+    },
+    retry: 3,
+  })
+
+
+
   const {
     register,
     handleSubmit,
-    reset,
+    
     formState: { errors },
   } = useForm();
 
@@ -53,27 +88,27 @@ const AddProductForm = () => {
             email:user?.email || ''
         }
       };
+ await mutateAsync(productData)
 
+// const result=await axios.post(`${import.meta.env.VITE_API_URL}/products`,productData)
+// console.log(result);
+;
 
-const {result}=await axios.post(`${import.meta.env.VITE_API_URL}/products`,productData)
-console.log(result);
-    //    Save to Database
-    //   await axios.post("http://localhost:5000/products", productData);
-
-      toast.dismiss();
-      toast.success(" Product Added Successfully!");
+      
       reset();
       setPreviewImages([]);
     } catch (error) {
-      toast.dismiss();
+      
       toast.error(" Product upload failed!");
       console.error(error);
     }
   }
+   if (isPending) return <LoadingSpinner />
+  if (isError) return <ErrorPage />
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <Toaster />
+     
 
       <div className="card bg-base-100 shadow-xl border">
         <div className="card-body">
