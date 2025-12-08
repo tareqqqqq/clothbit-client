@@ -1,6 +1,20 @@
+import axios from 'axios'
 import SellerOrderDataRow from '../../../components/Dashboard/TableRows/SellerOrderDataRow'
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
+import { useQuery } from '@tanstack/react-query'
+import useAuth from '../../../hooks/useAuth'
 
 const ManageOrders = () => {
+  const {user}=useAuth()
+    const { data: orders = [], isLoading } = useQuery({
+        queryKey: ['orders',user?.email],
+        queryFn: async () => {
+          const result = await axios(`${import.meta.env.VITE_API_URL}/manage-orders/${user?.email}`)
+          return result.data
+        },
+      })
+    
+      if (isLoading) return <LoadingSpinner />
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -56,7 +70,10 @@ const ManageOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <SellerOrderDataRow />
+                  {orders.map(order => (
+                                      <SellerOrderDataRow key={order._id} order={order} />
+                                    ))}
+                 
                 </tbody>
               </table>
             </div>

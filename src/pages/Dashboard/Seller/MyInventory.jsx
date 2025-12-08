@@ -1,6 +1,21 @@
+import axios from 'axios'
 import PlantDataRow from '../../../components/Dashboard/TableRows/PlantDataRow'
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
+import { useQuery } from '@tanstack/react-query'
+import useAuth from '../../../hooks/useAuth'
 
 const MyInventory = () => {
+  const {user}=useAuth()
+    const { data: products = [], isLoading } = useQuery({
+        queryKey: ['orders',user?.email],
+        queryFn: async () => {
+          const result = await axios(`${import.meta.env.VITE_API_URL}/my-products/${user?.email}`)
+          return result.data
+        },
+      })
+    
+      if (isLoading) return <LoadingSpinner />
+      
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -56,7 +71,10 @@ const MyInventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <PlantDataRow />
+                  {products.map(product => (
+                    <PlantDataRow key={product._id} product={product} />
+                  ))}
+                  
                 </tbody>
               </table>
             </div>

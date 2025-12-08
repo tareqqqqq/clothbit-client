@@ -2,7 +2,9 @@ import { useState } from 'react'
 import DeleteModal from '../../Modal/DeleteModal'
 import UpdatePlantModal from '../../Modal/UpdatePlantModal'
 
-const PlantDataRow = () => {
+const PlantDataRow = ({product}) => {
+  const { image, title, category, price, quantity, status } = prodduct || {}
+const imageArray=image[0]
   let [isOpen, setIsOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -21,7 +23,7 @@ const PlantDataRow = () => {
             <div className='block relative'>
               <img
                 alt='profile'
-                src='https://i.ibb.co.com/rMHmQP2/money-plant-in-feng-shui-brings-luck.jpg'
+                src={imageArray}
                 className='mx-auto object-cover rounded h-10 w-15 '
               />
             </div>
