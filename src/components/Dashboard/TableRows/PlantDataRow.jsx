@@ -3,8 +3,9 @@ import DeleteModal from '../../Modal/DeleteModal'
 import UpdatePlantModal from '../../Modal/UpdatePlantModal'
 
 const PlantDataRow = ({product}) => {
-  const { image, title, category, price, quantity, status } = prodduct || {}
-const imageArray=image[0]
+  console.log(product);
+  const { images, title, category, price, quantity} = product || {}
+const imageArray=images[0]
   let [isOpen, setIsOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -31,16 +32,16 @@ const imageArray=image[0]
         </div>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 '>Money Plant</p>
+        <p className='text-gray-900 '>{title}</p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 '>Indoor</p>
+        <p className='text-gray-900 '>{category}</p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 '>$120</p>
+        <p className='text-gray-900 '>${price}</p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 '>5</p>
+        <p className='text-gray-900 '>{quantity}</p>
       </td>
 
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>

@@ -9,10 +9,11 @@ const MyInventory = () => {
     const { data: products = [], isLoading } = useQuery({
         queryKey: ['orders',user?.email],
         queryFn: async () => {
-          const result = await axios(`${import.meta.env.VITE_API_URL}/my-products/${user?.email}`)
+          const result = await axios(`${import.meta.env.VITE_API_URL}/my-product/${user?.email}`)
           return result.data
         },
       })
+      console.log(products);
     
       if (isLoading) return <LoadingSpinner />
       
