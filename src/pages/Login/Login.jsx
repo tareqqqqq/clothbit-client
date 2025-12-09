@@ -54,25 +54,7 @@ const Login = () => {
       }
     }
 
-  // form submit handler
-  // const handleSubmit = async event => {
-  //   event.preventDefault()
-  //   const form = event.target
-  //   const email = form.email.value
-  //   const password = form.password.value
-
-  //   try {
-  //     //User Login
-  //     await signIn(email, password)
-
-  //     navigate(from, { replace: true })
-  //     toast.success('Login Successful')
-  //   } catch (err) {
-  //     console.log(err)
-  //     toast.error(err?.message)
-  //   }
-  // }
-
+  
   // Handle Google Signin
   const handleGoogleSignIn = async () => {
     try {

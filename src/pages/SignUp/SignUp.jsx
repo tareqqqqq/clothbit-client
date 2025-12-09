@@ -21,21 +21,17 @@ const SignUp = () => {
 
   const onSubmit = async data => {
     const { name, image,role, email, password } = data
+    console.log(data)
     const imageFile = image[0]
-    // const formData = new FormData()
-    // formData.append('image', imageFile)
+    
 
     try {
-      // const { data } = await axios.post(
-      //   `https://api.imgbb.com/1/upload?key=${
-      //     import.meta.env.VITE_IMGBB_API_KEY
-      //   }`,
-      //   formData
-      // )
+      
       const imageURL = await imageUpload(imageFile)
 
       //1. User Registration
       const result = await createUser(email, password)
+
               await saveOrUpdateUser({ name, email, image: imageURL,role,status: 'pending' })
       // 2. Generate image url from selected file
 
