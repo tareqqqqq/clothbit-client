@@ -4,7 +4,7 @@ import useAuth from '../../hooks/useAuth'
 import { toast } from 'react-hot-toast'
 import { TbFidgetSpinner } from 'react-icons/tb'
 import { useForm } from 'react-hook-form'
-import { imageUpload } from '../../utils'
+import { imageUpload, saveOrUpdateUser } from '../../utils'
 
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } = useAuth()
@@ -20,7 +20,7 @@ const SignUp = () => {
   } = useForm()
 
   const onSubmit = async data => {
-    const { name, image, email, password } = data
+    const { name, image,role, email, password } = data
     const imageFile = image[0]
     // const formData = new FormData()
     // formData.append('image', imageFile)
@@ -36,7 +36,7 @@ const SignUp = () => {
 
       //1. User Registration
       const result = await createUser(email, password)
-
+              await saveOrUpdateUser({ name, email, image: imageURL,role,status: 'pending' })
       // 2. Generate image url from selected file
 
       //3. Save username & profile photo
@@ -52,38 +52,21 @@ const SignUp = () => {
     }
   }
 
-  // form submit handler
-  // const handleSubmit = async event => {
-  //   event.preventDefault()
-  //   const form = event.target
-  //   const name = form.name.value
-  //   const email = form.email.value
-  //   const password = form.password.value
-
-  //   try {
-  //     //2. User Registration
-  //     const result = await createUser(email, password)
-
-  //     //3. Save username & profile photo
-  //     await updateUserProfile(
-  //       name,
-  //       'https://lh3.googleusercontent.com/a/ACg8ocKUMU3XIX-JSUB80Gj_bYIWfYudpibgdwZE1xqmAGxHASgdvCZZ=s96-c'
-  //     )
-  //     console.log(result)
-
-  //     navigate(from, { replace: true })
-  //     toast.success('Signup Successful')
-  //   } catch (err) {
-  //     console.log(err)
-  //     toast.error(err?.message)
-  //   }
-  // }
-
+  
   // Handle Google Signin
   const handleGoogleSignIn = async () => {
     try {
       //User Registration using google
-      await signInWithGoogle()
+     const { user } =   await signInWithGoogle()
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        email: user?.email,
+        image: user?.photoURL,
+        role: 'buyer',       
+  status: 'pending',  
+        
+      })
+
 
       navigate(from, { replace: true })
       toast.success('Signup Successful')
@@ -160,6 +143,23 @@ const SignUp = () => {
                 PNG, JPG or JPEG (max 2MB)
               </p>
             </div>
+
+            <div>
+  <label className='block mb-2 text-sm'>Role</label>
+  <select
+    className='w-full px-3 py-2 border rounded-md bg-gray-200'
+    {...register('role', { required: 'Role is required' })}
+  >
+    <option value=''>Select Role</option>
+    <option value='buyer'>Buyer</option>
+    <option value='manager'>Manager</option>
+  </select>
+
+  {errors.role && (
+    <p className='text-red-500 text-xs mt-1'>{errors.role.message}</p>
+  )}
+             </div>
+
             <div>
               <label htmlFor='email' className='block mb-2 text-sm'>
                 Email address
@@ -201,12 +201,13 @@ const SignUp = () => {
                 placeholder='*******'
                 className='w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-lime-500 bg-gray-200 text-gray-900'
              {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters',
-                  },
-                })}
+  required: 'Password is required',
+  pattern: {
+    value: /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/,
+    message:
+      'Password must be at least 6 characters and include both uppercase and lowercase letters',
+  },
+})}
               />
               {errors.password && (
                 <p className='text-red-500 text-xs mt-1'>
