@@ -1,21 +1,21 @@
-import axios from 'axios'
-import UserDataRow from '../../../components/Dashboard/TableRows/UserDataRow'
-import { useQuery } from '@tanstack/react-query'
-import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
+import axios from 'axios';
+import React from 'react';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
+import { useQuery } from '@tanstack/react-query';
+import AllOrdersDataRow from '../../../components/Dashboard/TableRows/AllOrdersDataRow';
 
-const ManageUsers = () => {
-
-   const { data: users = [], isLoading } = useQuery({
-      queryKey: ['products'],
-      queryFn: async () => {
-        const result = await axios(`${import.meta.env.VITE_API_URL}/users`)
-        return result.data
-      },
-    })
-  
-    if (isLoading) return <LoadingSpinner />
-  return (
-    <>
+const AllOrders = () => {
+     const { data: orders = [], isLoading } = useQuery({
+        queryKey: ['products'],
+        queryFn: async () => {
+          const result = await axios(`${import.meta.env.VITE_API_URL}/products`)
+          return result.data
+        },
+      })
+    
+      if (isLoading) return <LoadingSpinner />
+    return (
+        <>
       <div className='container mx-auto px-4 sm:px-8'>
         <div className='py-8'>
           <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
@@ -51,10 +51,10 @@ const ManageUsers = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map(user => (
-                                      <UserDataRow key={user._id} user={user} />
+                    {orders.map(order => (
+                                      <AllOrdersDataRow key={order._id} order={order} />
                                     ))}
-                  
+                 
                 </tbody>
               </table>
             </div>
@@ -62,7 +62,7 @@ const ManageUsers = () => {
         </div>
       </div>
     </>
-  )
-}
+    );
+};
 
-export default ManageUsers
+export default AllOrders;
