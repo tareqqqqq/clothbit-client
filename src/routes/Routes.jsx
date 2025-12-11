@@ -2,22 +2,25 @@ import Home from '../pages/Home/Home'
 import ErrorPage from '../pages/ErrorPage'
 import Login from '../pages/Login/Login'
 import SignUp from '../pages/SignUp/SignUp'
-
 import PrivateRoute from './PrivateRoute'
 import DashboardLayout from '../layouts/DashboardLayout'
-import AddPlant from '../pages/Dashboard/Seller/AddPlant'
 import ManageUsers from '../pages/Dashboard/Admin/ManageUsers'
 import Profile from '../pages/Dashboard/Common/Profile'
 import Statistics from '../pages/Dashboard/Common/Statistics'
 import MainLayout from '../layouts/MainLayout'
-import MyInventory from '../pages/Dashboard/Seller/MyInventory'
-import ManageOrders from '../pages/Dashboard/Seller/ManageOrders'
-import MyOrders from '../pages/Dashboard/Customer/MyOrders'
+
 import { createBrowserRouter } from 'react-router'
 import ProductDetails from '../pages/productDetails/ProductDetails'
 import PaymentSuccess from '../pages/Payment/PaymentSuccess'
 import AllProducts from '../pages/Dashboard/Admin/AllProducts'
 import AllOrders from '../pages/Dashboard/Admin/AllOrders'
+import AddProduct from '../pages/Dashboard/Manager/AddProduct'
+import ManageProducts from '../pages/Dashboard/Manager/ManageProducts'
+import PendingOrders from '../pages/Dashboard/Manager/PendingOrders'
+import ApprovedOrders from '../pages/Dashboard/Manager/ApprovedOrders'
+import TrackOrders from '../pages/Dashboard/Buyer/TrackOrders'
+import MyOrders from '../pages/Dashboard/Buyer/MyOrders'
+import ManageOrders from '../pages/Dashboard/Manager/ManageOrders'
 
 export const router = createBrowserRouter([
   {
@@ -58,22 +61,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'add-plant',
-        element: (
-          <PrivateRoute>
-            <AddPlant />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: 'my-inventory',
-        element: (
-          <PrivateRoute>
-            <MyInventory />
-          </PrivateRoute>
-        ),
-      },
-      {
         path: 'manage-users',
         element: (
           <PrivateRoute>
@@ -94,6 +81,46 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AllOrders />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'add-products',
+        element: (
+          <PrivateRoute>
+            <AddProduct />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'manage-products',
+        element: (
+          <PrivateRoute>
+            <ManageProducts />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'pending-orders',
+        element: (
+          <PrivateRoute>
+            <PendingOrders />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'approved-orders',
+        element: (
+          <PrivateRoute>
+            <ApprovedOrders />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'tracking-orders',
+        element: (
+          <PrivateRoute>
+            <TrackOrders />
           </PrivateRoute>
         ),
       },

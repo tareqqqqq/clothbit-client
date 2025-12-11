@@ -1,94 +1,196 @@
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import useAuth from '../../hooks/useAuth'
-import axios from 'axios'
-const PurchaseModal = ({ closeModal, isOpen,product }) => {
-  // Total Price Calculation
-  const { user } = useAuth()
-const {_id, title,description,images,manager,  category, quantity, price } = product || {}
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { useForm } from "react-hook-form";
+import useAuth from "../../hooks/useAuth";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-console.log(user)
+const PurchaseModal = ({ isOpen, closeModal, product }) => {
+  const { user } = useAuth();
 
-const handlePayment = async () => {
-    const paymentInfo = {
+  const {
+    _id,
+    title,
+    price,
+    quantity,
+    moq,       // Minimum order quantity
+    payment,   // PayFast / Cash on Delivery
+    manager,
+  } = product || {};
+
+  const { register, handleSubmit, watch, reset } = useForm();
+  const orderQty = watch("orderQuantity");
+  const totalPrice = orderQty ? orderQty * price : price;
+
+  const onSubmit = async (data) => {
+    // Validation
+    if (data.orderQuantity > quantity) {
+      return toast.error("❌ Order quantity cannot exceed available quantity!");
+    }
+    if (data.orderQuantity < moq) {
+      return toast.error(`❌ Minimum quantity is ${moq}`);
+    }
+
+    const orderData = {
       productId: _id,
       title,
-      category,
       price,
-      description,
-      images,
-      quantity: 1,
+      quantity: data.orderQuantity,
+      totalPrice,
+      buyerEmail: user?.email,
+      buyerName: `${data.firstName} ${data.lastName}`,
+      phone: data.phone,
+      address: data.address,
+      notes: data.notes,
+      paymentMethod: payment,  // comes from DB
+      status: payment === "PayFast" ? "pending" : "cod-pending",
       manager,
-      customer: {
-        name: user?.displayName,
-        email: user?.email,
-        image: user?.photoURL,
-      },
+    };
+
+    try {
+      // Online PayFast (Stripe)
+      if (payment === "PayFast") {
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/create-checkout-session`,
+          orderData
+        );
+        window.location.href = res.data.url;
+        return;
+      }
+
+      // Cash on Delivery
+      await axios.post(`${import.meta.env.VITE_API_URL}/orders`, orderData);
+      toast.success("Order placed successfully!");
+      reset();
+      closeModal();
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong!");
     }
-    const { data } = await axios.post(
-      `${import.meta.env.VITE_API_URL}/create-checkout-session`,
-      paymentInfo
-    )
-    console.log(data)
-    console.log(paymentInfo)
-    
-    window.location.href = data.url
-  }
+  };
+
   return (
     <Dialog
       open={isOpen}
-      as='div'
-      className='relative z-10 focus:outline-none '
       onClose={closeModal}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
     >
-      <div className='fixed inset-0 z-10 w-screen overflow-y-auto'>
-        <div className='flex min-h-full items-center justify-center p-4'>
-          <DialogPanel
-            transition
-            className='w-full max-w-md bg-white p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0 shadow-xl rounded-2xl'
+      <div className="absolute inset-0 bg-black/30"></div>
+
+      <DialogPanel className="relative w-full max-w-lg bg-white rounded-xl shadow-lg p-6 overflow-y-auto max-h-[90vh]">
+        <DialogTitle className="text-xl font-semibold text-center mb-4">
+          Place Your Order
+        </DialogTitle>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+
+          {/* Email */}
+          <div>
+            <label>Email</label>
+            <input
+              value={user?.email}
+              readOnly
+              className="w-full border p-2 rounded bg-gray-100"
+            />
+          </div>
+
+          {/* Product Name */}
+          <div>
+            <label>Product Name</label>
+            <input
+              value={title}
+              readOnly
+              className="w-full border p-2 rounded bg-gray-100"
+            />
+          </div>
+
+          {/* Price */}
+          <div>
+            <label>Price</label>
+            <input
+              value={`$${price}`}
+              readOnly
+              className="w-full border p-2 rounded bg-gray-100"
+            />
+          </div>
+
+          {/* First Name */}
+          <input
+            {...register("firstName", { required: true })}
+            placeholder="First Name"
+            className="w-full border p-2 rounded"
+          />
+
+          {/* Last Name */}
+          <input
+            {...register("lastName", { required: true })}
+            placeholder="Last Name"
+            className="w-full border p-2 rounded"
+          />
+
+          {/* Quantity */}
+          <div>
+            <label>
+              Order Quantity (Min: {moq}, Max: {quantity})
+            </label>
+            <input
+              {...register("orderQuantity", { required: true })}
+              type="number"
+              min={moq}
+              max={quantity}
+              placeholder="Order Quantity"
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          {/* Total Price */}
+          <div>
+            <label>Total Price</label>
+            <input
+              value={`$${totalPrice}`}
+              readOnly
+              className="w-full border p-2 rounded bg-gray-100"
+            />
+          </div>
+
+          {/* Phone */}
+          <input
+            {...register("phone", { required: true })}
+            placeholder="Contact Number"
+            className="w-full border p-2 rounded"
+          />
+
+          {/* Address */}
+          <textarea
+            {...register("address", { required: true })}
+            placeholder="Delivery Address"
+            className="w-full border p-2 rounded h-20"
+          ></textarea>
+
+          {/* Notes */}
+          <textarea
+            {...register("notes")}
+            placeholder="Additional Notes"
+            className="w-full border p-2 rounded h-16"
+          ></textarea>
+
+          {/* Button */}
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 rounded-md mt-3"
           >
-            <DialogTitle
-              as='h3'
-              className='text-lg font-medium text-center leading-6 text-gray-900'
-            >
-              Review Info Before Purchase
-            </DialogTitle>
-            <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Plant: {title}</p>
-            </div>
-            <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Category: {category}</p>
-            </div>
-            <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Customer:{user?.displayName}</p>
-            </div>
+            {payment === "PayFast" ? "Proceed to Payment" : "Place Order (COD)"}
+          </button>
+        </form>
 
-            <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Price: $ {price}</p>
-            </div>
-            <div className='mt-2'>
-              <p className='text-sm text-gray-500'>Available Quantity: {quantity}</p>
-            </div>
-            <div className='flex mt-2 justify-around'>
-              <button
-                type='button'
-                onClick={handlePayment}
-                className='cursor-pointer inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
-              >
-                Pay
-              </button>
-              <button
-                type='button'
-                className='cursor-pointer inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
-                onClick={closeModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </DialogPanel>
-        </div>
-      </div>
+        <button
+          onClick={closeModal}
+          className="w-full mt-3 bg-red-500 text-white py-2 rounded-md"
+        >
+          Cancel
+        </button>
+      </DialogPanel>
     </Dialog>
-  )
-}
+  );
+};
 
-export default PurchaseModal
+export default PurchaseModal;

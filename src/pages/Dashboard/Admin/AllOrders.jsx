@@ -8,7 +8,7 @@ const AllOrders = () => {
      const { data: orders = [], isLoading } = useQuery({
         queryKey: ['products'],
         queryFn: async () => {
-          const result = await axios(`${import.meta.env.VITE_API_URL}/products`)
+          const result = await axios(`${import.meta.env.VITE_API_URL}/orders`)
           return result.data
         },
       })

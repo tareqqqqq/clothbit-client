@@ -4,7 +4,7 @@ import UpdateUserRoleModal from '../../Modal/UpdateUserRoleModal'
 const UserDataRow = ({user}) => {
   let [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
-  console.log(user)
+  
   return (
     <tr>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>

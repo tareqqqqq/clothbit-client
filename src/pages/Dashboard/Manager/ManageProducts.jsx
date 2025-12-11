@@ -4,8 +4,9 @@ import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
 import { useQuery } from '@tanstack/react-query'
 import useAuth from '../../../hooks/useAuth'
 
-const MyInventory = () => {
-  const {user}=useAuth()
+const ManageProducts = () => {
+
+    const {user}=useAuth()
     const { data: products = [], isLoading } = useQuery({
         queryKey: ['orders',user?.email],
         queryFn: async () => {
@@ -16,9 +17,8 @@ const MyInventory = () => {
       console.log(products);
     
       if (isLoading) return <LoadingSpinner />
-      
-  return (
-    <>
+    return (
+         <>
       <div className='container mx-auto px-4 sm:px-8'>
         <div className='py-8'>
           <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
@@ -83,7 +83,7 @@ const MyInventory = () => {
         </div>
       </div>
     </>
-  )
-}
+    );
+};
 
-export default MyInventory
+export default ManageProducts;
