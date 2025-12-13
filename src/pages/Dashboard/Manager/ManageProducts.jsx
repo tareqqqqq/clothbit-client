@@ -1,14 +1,17 @@
 import axios from 'axios'
-import PlantDataRow from '../../../components/Dashboard/TableRows/PlantDataRow'
+
 import LoadingSpinner from '../../../components/Shared/LoadingSpinner'
 import { useQuery } from '@tanstack/react-query'
 import useAuth from '../../../hooks/useAuth'
+import { useState } from 'react'
+import ProductDataRow from '../../../components/Dashboard/TableRows/ProductDataRow'
 
 const ManageProducts = () => {
 
     const {user}=useAuth()
+    const [search, setSearch] = useState("");
     const { data: products = [], isLoading } = useQuery({
-        queryKey: ['orders',user?.email],
+        queryKey: ['products',user?.email],
         queryFn: async () => {
           const result = await axios(`${import.meta.env.VITE_API_URL}/my-product/${user?.email}`)
           return result.data
@@ -17,10 +20,37 @@ const ManageProducts = () => {
       console.log(products);
     
       if (isLoading) return <LoadingSpinner />
+        const filteredProducts = products.filter(
+    (p) =>
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.category.toLowerCase().includes(search.toLowerCase())
+  );
+  //     const handleDelete = async (id) => {
+  //   const confirm = window.confirm("Are you sure you want to delete this product?");
+  //   if (!confirm) return;
+
+  //   await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`);
+  //   refetch();
+  // };
     return (
          <>
       <div className='container mx-auto px-4 sm:px-8'>
         <div className='py-8'>
+          {/* 🔍 Search Input */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gray-700">
+          Manage Products
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Search by name or category"
+          className="border px-3 py-2 rounded-md w-full md:w-1/3"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
           <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
             <div className='inline-block min-w-full shadow rounded-lg overflow-hidden'>
               <table className='min-w-full leading-normal'>
@@ -72,8 +102,8 @@ const ManageProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map(product => (
-                    <PlantDataRow key={product._id} product={product} />
+                  {filteredProducts.map(product => (
+                    <ProductDataRow key={product._id} product={product} />
                   ))}
                   
                 </tbody>
