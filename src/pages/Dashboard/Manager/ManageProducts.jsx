@@ -10,7 +10,7 @@ const ManageProducts = () => {
 
     const {user}=useAuth()
     const [search, setSearch] = useState("");
-    const { data: products = [], isLoading } = useQuery({
+    const { data: products = [], isLoading,refetch } = useQuery({
         queryKey: ['products',user?.email],
         queryFn: async () => {
           const result = await axios(`${import.meta.env.VITE_API_URL}/my-product/${user?.email}`)
@@ -103,7 +103,7 @@ const ManageProducts = () => {
                 </thead>
                 <tbody>
                   {filteredProducts.map(product => (
-                    <ProductDataRow key={product._id} product={product} />
+                    <ProductDataRow key={product._id} refetch={refetch} product={product} />
                   ))}
                   
                 </tbody>

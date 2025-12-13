@@ -21,6 +21,7 @@ import ApprovedOrders from '../pages/Dashboard/Manager/ApprovedOrders'
 import TrackOrders from '../pages/Dashboard/Buyer/TrackOrders'
 import MyOrders from '../pages/Dashboard/Buyer/MyOrders'
 import ManageOrders from '../pages/Dashboard/Manager/ManageOrders'
+import UpdateProductForm from '../components/Form/UpdateProductForm'
 
 export const router = createBrowserRouter([
   {
@@ -89,6 +90,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AddProduct />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'update-product/:id',
+        element: (
+          <PrivateRoute>
+            <UpdateProductForm />
           </PrivateRoute>
         ),
       },
